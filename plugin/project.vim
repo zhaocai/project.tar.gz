@@ -12,8 +12,8 @@ if exists('loaded_project') || &cp
 endif
 let loaded_project=1
 
-function! s:Project(filename) " <<<
-    " Initialization <<<
+function! s:Project(filename) "                                           <<<1
+    " Initialization                                                      <<<2
     if exists("g:proj_running")
         if strlen(a:filename) != 0
             call confirm('Project already loaded; ignoring filename "'.a:filename."\".\n".'See ":help project-invoking" for information about changing project files.', "&OK", 1)
@@ -73,14 +73,14 @@ function! s:Project(filename) " <<<
 
     let g:proj_last_buffer = -1
     ">>>
-    " ProjFoldText() <<<
+    " ProjFoldText()                                                      <<<2
     "   The foldtext function for displaying just the description.
     function! ProjFoldText()
         let line=substitute(getline(v:foldstart),'^[ \t#]*\([^=]*\).*', '\1', '')
         let line=strpart('                                     ', 0, (v:foldlevel - 1)).substitute(line,'\s*{\+\s*', '', '')
         return line
     endfunction ">>>
-    " s:DoSetup() <<<
+    " s:DoSetup()                                                         <<<2
     "   Ensure everything is set up
     function! s:DoSetup()
         setlocal foldenable foldmethod=marker foldmarker={,} commentstring=%s foldcolumn=0 nonumber noswapfile shiftwidth=1
@@ -91,11 +91,13 @@ function! s:Project(filename) " <<<
         endif
     endfunction ">>>
     call s:DoSetup()
-    " Syntax Stuff <<<
+    " Syntax Stuff                                                        <<<2
     if match(g:proj_flags, '\Cs')==-1 
 		set ft=none
+	else
+		set ft=vimproject
     endif ">>>
-    " s:SortR(start, end) <<<
+    " s:SortR(start, end)                                                 <<<2
     " Sort lines.  SortR() is called recursively.
     "  from ":help eval-examples" by Robert Webb, slightly modified
     function! s:SortR(start, end)
@@ -137,7 +139,7 @@ function! s:Project(filename) " <<<
         call s:SortR(a:start, partition - 1)
         call s:SortR(partition + 1, a:end)
     endfunc ">>>
-    " s:IsAbsolutePath(path) <<<
+    " s:IsAbsolutePath(path)                                              <<<2
     "   Returns true if filename has an absolute path.
     function! s:IsAbsolutePath(path)
         if a:path =~ '^ftp:' || a:path =~ '^rcp:' || a:path =~ '^scp:' || a:path =~ '^http:'
@@ -153,7 +155,7 @@ function! s:Project(filename) " <<<
         endif
         return 0
     endfunction " >>>
-    " s:DoSetupAndSplit() <<<
+    " s:DoSetupAndSplit()                                                 <<<2
     "   Call DoSetup to ensure the settings are correct.  Split to the next
     "   file.
     function! s:DoSetupAndSplit()
@@ -177,7 +179,7 @@ function! s:Project(filename) " <<<
             wincmd p
         endif
     endfunction ">>>
-    " s:DoSetupAndSplit_au() <<<
+    " s:DoSetupAndSplit_au()                                              <<<2
     "   Same as above but ensure that the Project window is the current
     "   window.  Only called from an autocommand
     function! s:DoSetupAndSplit_au()
@@ -202,7 +204,7 @@ function! s:Project(filename) " <<<
     function! s:RecordPrevBuffer_au()
         let g:proj_last_buffer = bufnr('%')
     endfunction ">>>
-    " s:RecursivelyConstructDirectives(lineno) <<<
+    " s:RecursivelyConstructDirectives(lineno)                            <<<2
     "   Construct the inherited directives
     function! s:RecursivelyConstructDirectives(lineno)
         let lineno=s:FindFoldTop(a:lineno)
@@ -258,7 +260,7 @@ function! s:Project(filename) " <<<
         if filter == '' | let filter = parent_filter | endif
         return s:ConstructInfo(home, c_d, scriptin, scriptout, '', filter)
     endfunction ">>>
-    " s:ConstructInfo(home, c_d, scriptin, scriptout, flags, filter) <<<
+    " s:ConstructInfo(home, c_d, scriptin, scriptout, flags, filter)      <<<2
     function! s:ConstructInfo(home, c_d, scriptin, scriptout, flags, filter)
         let retval='Directory='.a:home
         if a:c_d[0] != ''
@@ -275,7 +277,7 @@ function! s:Project(filename) " <<<
         endif
         return retval
     endfunction ">>>
-    " s:OpenEntry(line, precmd, editcmd) <<<
+    " s:OpenEntry(line, precmd, editcmd)                                  <<<2
     "   Get the filename under the cursor, and open a window with it.
     function! s:OpenEntry(line, precmd, editcmd, dir)
         silent exec a:precmd
@@ -301,7 +303,7 @@ function! s:Project(filename) " <<<
         return retval
     endfunction
     ">>>
-    " s:OpenEntry2(line, infoline, precmd, editcmd) <<<
+    " s:OpenEntry2(line, infoline, precmd, editcmd)                       <<<2
     "   Get the filename under the cursor, and open a window with it.
     function! s:OpenEntry2(line, infoline, fname, editcmd)
         let fname=escape(a:fname, ' %#')        " Thanks to Thomas Link for cluing me in on % and #
@@ -359,7 +361,7 @@ function! s:Project(filename) " <<<
         return 1
     endfunction
     ">>>
-    " s:DoFoldOrOpenEntry(cmd0, cmd1) <<<
+    " s:DoFoldOrOpenEntry(cmd0, cmd1)                                     <<<2
     "   Used for double clicking. If the mouse is on a fold, open/close it. If
     "   not, try to open the file.
     function! s:DoFoldOrOpenEntry(cmd0, cmd1)
@@ -379,7 +381,7 @@ function! s:Project(filename) " <<<
             endif
         endif
     endfunction ">>>
-    " s:VimDirListing(filter, padding, separator, filevariable, filecount, dirvariable, dircount) <<<
+    " s:VimDirListing(filter, padding, separator, filevariable, filecount, dirvariable, dircount)<<<2
     function! s:VimDirListing(filter, padding, separator, filevariable, filecount, dirvariable, dircount)
         let end = 0
         let files=''
@@ -418,7 +420,7 @@ function! s:Project(filename) " <<<
             endif
         endwhile
     endfunction ">>>
-    " s:GenerateEntry(recursive, name, absolute_dir, dir, c_d, filter_directive, filter, foldlev, sort) <<<
+    " s:GenerateEntry(recursive, name, absolute_dir, dir, c_d, filter_directive, filter, foldlev, sort)<<<2
     function! s:GenerateEntry(recursive, line, name, absolute_dir, dir, c_d, filter_directive, filter, foldlev, sort)
         let line=a:line
         if a:dir =~ '\\ '
@@ -448,7 +450,7 @@ function! s:Project(filename) " <<<
         endif
         return line+1
     endfunction " >>>
-    " s:DoEntryFromDir(line, name, absolute_dir, dir, c_d, filter_directive, filter, foldlev, sort) <<<
+    " s:DoEntryFromDir(line, name, absolute_dir, dir, c_d, filter_directive, filter, foldlev, sort)<<<2
     "   Generate the fold from the directory hierarchy (if recursive), then
     "   fill it in with RefreshEntriesFromDir()
     function! s:DoEntryFromDir(recursive, line, name, absolute_dir, dir, c_d, filter_directive, filter, foldlev, sort)
@@ -456,7 +458,7 @@ function! s:Project(filename) " <<<
         normal! j
         call s:RefreshEntriesFromDir(1)
     endfunction ">>>
-    " s:CreateEntriesFromDir(recursive) <<<
+    " s:CreateEntriesFromDir(recursive)                                   <<<2
     "   Prompts user for information and then calls s:DoEntryFromDir()
     function! s:CreateEntriesFromDir(recursive)
         " Save a mark for the current cursor position
@@ -533,7 +535,7 @@ function! s:Project(filename) " <<<
         " Restore the cursor position
         normal! `k
     endfunction ">>>
-    " s:RefreshEntriesFromDir(recursive) <<<
+    " s:RefreshEntriesFromDir(recursive)                                  <<<2
     "   Finds metadata at the top of the fold, and then replaces all files
     "   with the contents of the directory.  Works recursively if recursive is 1.
     function! s:RefreshEntriesFromDir(recursive)
@@ -667,7 +669,7 @@ function! s:Project(filename) " <<<
         " Go to the top of the refreshed fold.
         normal! [z
     endfunction ">>>
-    " s:MoveUp() <<<
+    " s:MoveUp()                                                          <<<2
     "   Moves the entity under the cursor up a line.
     function! s:MoveUp()
         let lineno=line('.')
@@ -686,7 +688,7 @@ function! s:Project(filename) " <<<
             normal! zc
         endif
     endfunction ">>>
-    " s:MoveDown() <<<
+    " s:MoveDown()                                                        <<<2
     "   Moves the entity under the cursor down a line.
     function! s:MoveDown()
         let fc=foldclosed('.')
@@ -697,7 +699,7 @@ function! s:Project(filename) " <<<
             normal! zc
         endif
     endfunction " >>>
-    " s:DisplayInfo() <<<
+    " s:DisplayInfo()                                                     <<<2
     "   Displays filename and current working directory when i (info) is in
     "   the flags.
     function! s:DisplayInfo()
@@ -705,7 +707,7 @@ function! s:Project(filename) " <<<
             echo 'file: '.expand('%').', cwd: '.getcwd().', lines: '.line('$')
         endif
     endfunction ">>>
-    " s:SetupAutoCommand(cwd) <<<
+    " s:SetupAutoCommand(cwd)                                             <<<2
     "   Sets up an autocommand to ensure that the cwd is set to the one
     "   desired for the fold regardless.  :lcd only does this on a per-window
     "   basis, not a per-buffer basis.
@@ -719,7 +721,7 @@ function! s:Project(filename) " <<<
             exec 'au BufWipeout '.bufname.' au! * '.bufname
         endif
     endfunction ">>>
-    " s:SetupScriptAutoCommand(bufcmd, script) <<<
+    " s:SetupScriptAutoCommand(bufcmd, script)                            <<<2
     "   Sets up an autocommand to run the scriptin script.
     function! s:SetupScriptAutoCommand(bufcmd, script)
         if !exists("b:proj_has_".a:bufcmd)
@@ -727,7 +729,7 @@ function! s:Project(filename) " <<<
             exec 'au '.a:bufcmd.' '.escape(substitute(expand('%:p', 0), '\\', '/', 'g'), ' ').' source '.a:script
         endif
     endfunction " >>>
-    " s:DoEnsurePlacementSize_au() <<<
+    " s:DoEnsurePlacementSize_au()                                        <<<2
     "   Ensure that the Project window is on the left of the window and has
     "   the correct size. Only called from an autocommand
     function! s:DoEnsurePlacementSize_au()
@@ -744,7 +746,7 @@ function! s:Project(filename) " <<<
         endif
         exec b:proj_resize_command
     endfunction ">>>
-    " s:Spawn(number) <<<
+    " s:Spawn(number)                                                     <<<2
     "   Spawn an external command on the file
     function! s:Spawn(number)
         echo | if exists("g:proj_run".a:number)
@@ -778,11 +780,11 @@ function! s:Project(filename) " <<<
                 let command=substitute(command, '%d', escape(c_d, '\'), 'g')
                 let command=substitute(command, '%D', substitute(escape(c_d, '\'), ' ', '\\\\ ', 'g'), 'g')
                 let command=substitute(command, "\010", '%', 'g')
-                exec command
+				exec command
             endif
         endif
     endfunction ">>>
-    " s:ListSpawn(varnamesegment) <<<
+    " s:ListSpawn(varnamesegment)                                         <<<2
     "   List external commands
     function! s:ListSpawn(varnamesegment)
         let number = 1
@@ -795,7 +797,7 @@ function! s:Project(filename) " <<<
             let number=number + 1
         endwhile
     endfunction ">>>
-    " s:FindFoldTop(line) <<<
+    " s:FindFoldTop(line)                                                 <<<2
     "   Return the line number of the directive line
     function! s:FindFoldTop(line)
         let lineno=a:line
@@ -810,7 +812,7 @@ function! s:Project(filename) " <<<
         endwhile
         return lineno
     endfunction ">>>
-    " s:FindFoldBottom(line) <<<
+    " s:FindFoldBottom(line)                                              <<<2
     "   Return the line number of the directive line
     function! s:FindFoldBottom(line)
         let lineno=a:line
@@ -825,7 +827,7 @@ function! s:Project(filename) " <<<
         endwhile
         return lineno
     endfunction ">>>
-    " s:LoadAll(recurse, line) <<<
+    " s:LoadAll(recurse, line)                                            <<<2
     "   Load all files in a project
     function! s:LoadAll(recurse, line)
         let b:loadcount=0
@@ -845,7 +847,7 @@ function! s:Project(filename) " <<<
         unlet b:loadcount
         if exists("b:stop_everything") | unlet b:stop_everything | endif
     endfunction ">>>
-    " s:WipeAll(recurse, line) <<<
+    " s:WipeAll(recurse, line)                                            <<<2
     "   Wipe all files in a project
     function! s:WipeAll(recurse, line)
         let b:wipecount=0
@@ -883,7 +885,7 @@ function! s:Project(filename) " <<<
         unlet b:wipecount b:totalcount
         if exists("b:stop_everything") | unlet b:stop_everything | endif
     endfunction ">>>
-    " s:LoadAllSplit(recurse, line) <<<
+    " s:LoadAllSplit(recurse, line)                                       <<<2
     "   Load all files in a project using split windows.
     "   Contributed by A. Harrison
     function! s:LoadAllSplit(recurse, line)
@@ -905,7 +907,7 @@ function! s:Project(filename) " <<<
         unlet b:loadcount
         if exists("b:stop_everything") | unlet b:stop_everything | endif
     endfunction ">>>
-    " s:GrepAll(recurse, lineno, pattern) <<<
+    " s:GrepAll(recurse, lineno, pattern)                                 <<<2
     "   Grep all files in a project, optionally recursively
     function! s:GrepAll(recurse, lineno, pattern)
         cunmap <buffer> help
@@ -924,14 +926,22 @@ function! s:Project(filename) " <<<
             if v:shell_error != 0
                 echo 'GREP error. Perhaps there are too many filenames.'
             else
-                copen
+				if exists("g:loaded_zlib")
+					call zlib#quickfix#open(0,1,1,64)
+				else
+					copen
+				endif
             endif
-        else
-            silent! exec 'silent! vimgrep '.pattern.' '.fnames
-            copen
-        endif
+		else
+			silent! exec 'silent! vimgrep '.pattern.' '.fnames
+			if exists("g:loaded_zlib")
+				call zlib#quickfix#open(0,1,1,64)
+			else
+				copen
+			endif
+		endif
     endfunction ">>>
-    " GetXXX Functions <<<
+    " GetXXX Functions                                                    <<<2
     function! s:GetHome(info, parent_home)
         " Thanks to Adam Montague for pointing out the need for @ in urls.
         let home=substitute(a:info, '^[^=]*=\(\(\\ \|\f\|:\|@\)\+\).*', '\1', '')
@@ -995,7 +1005,7 @@ function! s:Project(filename) " <<<
         endif
         return flags
     endfunction ">>>
-    " Project_GetAllFnames(recurse, lineno, separator) <<<
+    " Project_GetAllFnames(recurse, lineno, separator)                    <<<2
     "   Grep all files in a project, optionally recursively
     function! Project_GetAllFnames(recurse, lineno, separator)
         let b:fnamelist=''
@@ -1016,7 +1026,7 @@ function! s:Project(filename) " <<<
         unlet b:fnamelist
         return retval
     endfunction ">>>
-    " Project_GetAllFnames(recurse, lineno, separator) <<<
+    " Project_GetAllFnames(recurse, lineno, separator)                    <<<2
     "   Grep all files in a project, optionally recursively
     function! Project_GetFname(line)
         if (foldlevel(a:line) == 0)
@@ -1033,7 +1043,7 @@ function! s:Project(filename) " <<<
         let infoline = s:RecursivelyConstructDirectives(a:line)
         return s:GetHome(infoline, '').'/'.fname
     endfunction ">>>
-    " Project_ForEach(recurse, lineno, cmd, data, match) <<<
+    " Project_ForEach(recurse, lineno, cmd, data, match)                  <<<2
     "   Grep all files in a project, optionally recursively
     function! Project_ForEach(recurse, lineno, cmd, data, match)
         let info=s:RecursivelyConstructDirectives(a:lineno)
@@ -1089,7 +1099,7 @@ function! s:Project(filename) " <<<
         endwhile
         return lineno
     endfunction ">>>
-    " s:SpawnAll(recurse, number) <<<
+    " s:SpawnAll(recurse, number)                                         <<<2
     "   Spawn an external command on the files of a project
     function! s:SpawnAll(recurse, number)
         echo | if exists("g:proj_run_fold".a:number)
@@ -1124,7 +1134,7 @@ function! s:Project(filename) " <<<
         endif
     endfunction ">>>
     if !exists("g:proj_running")
-        " s:DoProjectOnly(void) <<<
+        " s:DoProjectOnly(void)                                           <<<2
         "   Make the file window the only one.
         function! s:DoProjectOnly()
             if winbufnr(0) != g:proj_running
@@ -1138,8 +1148,9 @@ function! s:Project(filename) " <<<
             endif
         endfunction
         " >>>
-
-        " Mappings <<<
+		
+		
+        " Mappings                                                        <<<2
         nnoremap <buffer> <silent> <Return>   \|:call <SID>DoFoldOrOpenEntry('', 'e')<CR>
         nnoremap <buffer> <silent> <S-Return> \|:call <SID>DoFoldOrOpenEntry('', 'sp')<CR>
         nnoremap <buffer> <silent> <C-Return> \|:call <SID>DoFoldOrOpenEntry('silent! only', 'e')<CR>
@@ -1207,7 +1218,7 @@ function! s:Project(filename) " <<<
             endif
         endif " >>>
         if filereadable(glob('~/.vimproject_mappings')) | source ~/.vimproject_mappings | endif
-        " Autocommands <<<
+        " Autocommands                                                    <<<2
         " Autocommands to clean up if we do a buffer wipe
         " These don't work unless we substitute \ for / for Windows
         let bufname=escape(substitute(expand('%:p', 0), '\\', '/', 'g'), ' ')
@@ -1234,7 +1245,7 @@ if exists(':Project') != 2
     command -nargs=? -complete=file Project call <SID>Project('<args>')
 endif
 " Toggle Mapping
-if !exists("*<SID>DoToggleProject()") "<<<
+if !exists("*<SID>DoToggleProject()")                                    "<<<1
     function! s:DoToggleProject()
         if !exists('g:proj_running') || bufwinnr(g:proj_running) == -1
             Project
