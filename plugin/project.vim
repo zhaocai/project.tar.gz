@@ -344,7 +344,7 @@ function! s:Project(filename) " <<<
             if !filereadable(glob(scriptin))
                 call confirm('"'.scriptin.'" not found. Ignoring.', "&OK", 1)
             else
-                call s:SetupScriptAutoCommand('BufEnter', scriptin)
+                call s:SetupScriptAutoCommand('BufReadPre', scriptin)
                 exec 'source '.scriptin
             endif
         endif
@@ -353,7 +353,7 @@ function! s:Project(filename) " <<<
             if !filereadable(glob(scriptout))
                 call confirm('"'.scriptout.'" not found. Ignoring.', "&OK", 1)
             else
-                call s:SetupScriptAutoCommand('BufLeave', scriptout)
+                call s:SetupScriptAutoCommand('BufUnload', scriptout)
             endif
         endif
         return 1
