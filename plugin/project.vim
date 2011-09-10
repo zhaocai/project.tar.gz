@@ -96,6 +96,7 @@ function! s:Project(filename) "                                           <<<1
 		set ft=none
 	else
 		set ft=vimproject
+		syntax on
     endif ">>>
     " s:SortR(start, end)                                                 <<<2
     " Sort lines.  SortR() is called recursively.
