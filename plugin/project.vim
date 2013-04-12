@@ -1,7 +1,7 @@
 "=============================================================================
 " File:        project.vim
 " Author:      Aric Blumer (Aric.Blumer at aricvim@charter.net)
-" Last Change: Fri 13 Oct 2006 09:47:08 AM EDT
+" Last Change: Thu 20 Sep 2012 04:39:10 PM EDT
 " Version:     1.4.1
 "=============================================================================
 " See documentation in accompanying help file
@@ -911,36 +911,37 @@ function! s:Project(filename) "                                           <<<1
     " s:GrepAll(recurse, lineno, pattern)                                 <<<2
     "   Grep all files in a project, optionally recursively
     function! s:GrepAll(recurse, lineno, pattern)
-        cunmap <buffer> help
-        let pattern=(a:pattern[0] == '')?input("GREP options and pattern: "):a:pattern
-        cnoremap <buffer> help let g:proj_doinghelp = 1<CR>:help
-        if pattern[0] == ''
-            return
+      cunmap <buffer> help
+      let pattern=(a:pattern[0] == '')?input("GREP options and pattern: "):a:pattern
+      cnoremap <buffer> help let g:proj_doinghelp = 1<CR>:help
+      if pattern[0] == ''
+        return
+      endif
+      let b:escape_spaces=1
+      let fnames=Project_GetAllFnames(a:recurse, a:lineno, ' ')
+      unlet b:escape_spaces
+      cclose " Make sure grep window is closed
+      call s:DoSetupAndSplit()
+      if match(g:proj_flags, '\Cv') == -1
+        silent! exec 'silent! grep '.pattern.' '.fnames
+        if v:shell_error != 0
+          echo 'GREP error. Perhaps there are too many filenames.'
+        else
+          try
+            call zl#quickfix#open(0,1,1,64)
+          catch /^Vim\%((\a\+)\)\=:E107/
+            copen
+          endtry
         endif
-        let b:escape_spaces=1
-        let fnames=Project_GetAllFnames(a:recurse, a:lineno, ' ')
-        unlet b:escape_spaces
-        cclose " Make sure grep window is closed
-        call s:DoSetupAndSplit()
-        if match(g:proj_flags, '\Cv') == -1
-            silent! exec 'silent! grep '.pattern.' '.fnames
-            if v:shell_error != 0
-                echo 'GREP error. Perhaps there are too many filenames.'
-            else
-				if exists("g:loaded_zlib")
-					call zlib#quickfix#open(0,1,1,64)
-				else
-					copen
-				endif
-            endif
-		else
-			silent! exec 'silent! vimgrep '.pattern.' '.fnames
-			if exists("g:loaded_zlib")
-				call zlib#quickfix#open(0,1,1,64)
-			else
-				copen
-			endif
-		endif
+      else
+        silent! exec 'silent! vimgrep '.pattern.' '.fnames
+        try
+          call zl#quickfix#open(0,1,1,64)
+        catch /^Vim\%((\a\+)\)\=:E107/
+          copen
+        endtry
+
+      endif
     endfunction ">>>
     " GetXXX Functions                                                    <<<2
     function! s:GetHome(info, parent_home)
@@ -1214,8 +1215,8 @@ function! s:Project(filename) "                                           <<<1
         nnoremap <script> <Plug>ProjectOnly :call <SID>DoProjectOnly()<CR>
         if match(g:proj_flags, '\Cm') != -1
             if !hasmapto('<Plug>ProjectOnly')
-                nmap <silent> <unique> <C-W>o <Plug>ProjectOnly
-                nmap <silent> <unique> <C-W><C-O> <C-W>o
+                nmap <silent> <C-W>o <Plug>ProjectOnly
+                nmap <silent> <C-W><C-O> <C-W>o
             endif
         endif " >>>
         if filereadable(glob('~/.vimproject_mappings')) | source ~/.vimproject_mappings | endif
